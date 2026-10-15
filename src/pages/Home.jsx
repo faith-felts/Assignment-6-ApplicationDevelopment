@@ -1,61 +1,73 @@
+import { useEffect, useState } from 'react';
+import ErrorMessage from '../components/ErrorMessage';
+import LoadingSpinner from '../components/LoadingSpinner';
 import MovieGrid from '../components/MovieGrid';
+import { getPopularMovies } from '../services/movieService';
 
-// Static movie data for template
-const staticMovies = [
-  {
-    id: 1,
-    title: "The Shawshank Redemption",
-    poster_path: "/placeholder-poster.jpg",
-    vote_average: 9.3,
-    release_date: "1994-09-23"
-  },
-  {
-    id: 2,
-    title: "The Godfather",
-    poster_path: "/placeholder-poster.jpg",
-    vote_average: 9.2,
-    release_date: "1972-03-14"
-  },
-  {
-    id: 3,
-    title: "The Dark Knight",
-    poster_path: "/placeholder-poster.jpg",
-    vote_average: 9.0,
-    release_date: "2008-07-18"
-  },
-  {
-    id: 4,
-    title: "Pulp Fiction",
-    poster_path: "/placeholder-poster.jpg",
-    vote_average: 8.9,
-    release_date: "1994-10-14"
-  },
-  {
-    id: 5,
-    title: "Forrest Gump",
-    poster_path: "/placeholder-poster.jpg",
-    vote_average: 8.8,
-    release_date: "1994-06-23"
-  },
-  {
-    id: 6,
-    title: "Inception",
-    poster_path: "/placeholder-poster.jpg",
-    vote_average: 8.7,
-    release_date: "2010-07-16"
-  }
-];
+function Home({
+  searchResults,
+  searchLoading,
+  searchError,
+  favorites,
+  favoritesLoading,
+  favoritesError,
+  onToggleFavorite,
+}) {
+  const [popularMovies, setPopularMovies] = useState([]);
+  const [popularLoading, setPopularLoading] = useState(true);
+  const [popularError, setPopularError] = useState('');
 
-function Home() {
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadPopularMovies() {
+      try {
+        const data = await getPopularMovies({ signal: controller.signal });
+        setPopularMovies(data.results);
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          setPopularError(error.message);
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setPopularLoading(false);
+        }
+      }
+    }
+
+    loadPopularMovies();
+    return () => controller.abort();
+  }, []);
+
+  const showingSearchResults = searchResults !== null;
+  const movies = showingSearchResults ? searchResults : popularMovies;
+  const loading = showingSearchResults ? searchLoading : popularLoading;
+  const error = showingSearchResults ? searchError : popularError;
+
   return (
     <main className="main-content">
       <div className="content-header">
-        <h2>Popular Movies</h2>
-        <p>Discover and save your favorite films</p>
+        <h2>{showingSearchResults ? 'Search Results' : 'Popular Movies'}</h2>
+        <p>{showingSearchResults ? 'Movies matching your search' : 'Discover and save your favorite films'}</p>
       </div>
-      <MovieGrid movies={staticMovies} />
+      {favoritesError && <ErrorMessage message={favoritesError} />}
+      {error && <ErrorMessage message={error} />}
+      {loading ? (
+        <LoadingSpinner />
+      ) : movies.length > 0 ? (
+        <MovieGrid
+          movies={movies}
+          favorites={favorites}
+          favoritesLoading={favoritesLoading}
+          onToggleFavorite={onToggleFavorite}
+        />
+      ) : !error ? (
+        <div className="empty-state">
+          <p>{showingSearchResults ? 'No movies found. Try another search.' : 'No popular movies are available.'}</p>
+        </div>
+      ) : null}
     </main>
   );
-};
+}
 
 export default Home;

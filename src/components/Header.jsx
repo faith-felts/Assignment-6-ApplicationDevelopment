@@ -1,6 +1,22 @@
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-function Header() {
+function Header({ onSearch }) {
+  const [query, setQuery] = useState('');
+  const debounceTimer = useRef(null);
+
+  useEffect(() => {
+    debounceTimer.current = setTimeout(() => onSearch(query), 350);
+
+    return () => clearTimeout(debounceTimer.current);
+  }, [query, onSearch]);
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    clearTimeout(debounceTimer.current);
+    onSearch(query);
+  }
+
   return (
     <header className="header">
       <div className="header-content">
@@ -9,17 +25,20 @@ function Header() {
           <Link to="/" className="nav-link">Home</Link>
           <Link to="/favorites" className="nav-link">Favorites</Link>
         </nav>
-        <div className="search-container">
+        <form className="search-container" onSubmit={handleSubmit}>
           <input 
             type="text" 
             placeholder="Search movies..."
             className="search-input"
+            aria-label="Search movies"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
           />
-          <button className="search-button">Search</button>
-        </div>
+          <button className="search-button" type="submit">Search</button>
+        </form>
       </div>
     </header>
   );
-};
+}
 
 export default Header;

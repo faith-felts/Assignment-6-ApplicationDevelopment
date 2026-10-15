@@ -1,16 +1,24 @@
-# React + Vite
+# MovieShelf
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+MovieShelf is a React application for browsing popular movies, searching TMDB, and saving favorites in your browser.
 
-Currently, two official plugins are available:
+## Getting started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. Install dependencies with `npm install`.
+2. Create a `.env` file in the project root:
 
-## React Compiler
+   ```env
+   VITE_TMDB_API_KEY=your_api_key_here
+   VITE_TMDB_BASE_URL=https://api.themoviedb.org/3
+   ```
 
-The React Compiler is not enabled on this template. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+3. Start the development server with `npm run dev`.
 
-## Expanding the ESLint configuration
+The `.env` file is ignored by Git. Vite exposes `VITE_` variables to browser code, so use a TMDB key intended for client-side use and do not put privileged secrets in this file.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Scripts
+
+- `npm run dev` starts the development server.
+- `npm run build` creates a production build.
+- `npm run lint` runs ESLint.
+- `npm run preview` previews the production build.
