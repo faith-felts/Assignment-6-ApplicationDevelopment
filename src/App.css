@@ -95,6 +95,18 @@ body {
   background-color: #b20710;
 }
 
+.search-container-disabled .search-input,
+.search-container-disabled .search-button {
+  border-color: #555555;
+  background-color: #3a3a3a;
+  color: #888888;
+  cursor: not-allowed;
+}
+
+.search-container-disabled .search-input::placeholder {
+  color: #888888;
+}
+
 .search-button:focus-visible,
 .favorite-button:focus-visible,
 .nav-link:focus-visible,

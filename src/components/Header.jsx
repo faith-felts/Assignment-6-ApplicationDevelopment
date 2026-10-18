@@ -1,18 +1,28 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 function Header({ onSearch }) {
   const [query, setQuery] = useState('');
   const debounceTimer = useRef(null);
+  const { pathname } = useLocation();
+  const searchDisabled = pathname === '/favorites';
 
   useEffect(() => {
+    if (searchDisabled) {
+      return undefined;
+    }
+
     debounceTimer.current = setTimeout(() => onSearch(query), 350);
 
     return () => clearTimeout(debounceTimer.current);
-  }, [query, onSearch]);
+  }, [query, onSearch, searchDisabled]);
 
   function handleSubmit(event) {
     event.preventDefault();
+    if (searchDisabled) {
+      return;
+    }
+
     clearTimeout(debounceTimer.current);
     onSearch(query);
   }
@@ -25,7 +35,10 @@ function Header({ onSearch }) {
           <Link to="/" className="nav-link">Home</Link>
           <Link to="/favorites" className="nav-link">Favorites</Link>
         </nav>
-        <form className="search-container" onSubmit={handleSubmit}>
+        <form
+          className={`search-container${searchDisabled ? ' search-container-disabled' : ''}`}
+          onSubmit={handleSubmit}
+        >
           <input 
             type="text" 
             placeholder="Search movies..."
@@ -33,8 +46,9 @@ function Header({ onSearch }) {
             aria-label="Search movies"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            disabled={searchDisabled}
           />
-          <button className="search-button" type="submit">Search</button>
+          <button className="search-button" type="submit" disabled={searchDisabled}>Search</button>
         </form>
       </div>
     </header>
